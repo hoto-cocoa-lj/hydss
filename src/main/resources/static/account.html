@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="common::head"></th:block>
+    <th:block th:replace="common::jscsspart"></th:block>
+    <style>
+        .btn {
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+        /*.nav-tabs > li.active > a {*/
+        /*    background: #9dd;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active"><a href="#jd" data-toggle="tab">京东</a></li>
+    <li><a href="#sn" data-toggle="tab">苏宁</a></li>
+    <li><a href="#pdd" data-toggle="tab">拼多多</a></li>
+    <li><a th:href="@{/}">首页</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="jd">
+        <th:block th:replace="common::shopcontent('JD')"></th:block>
+    </div>
+    <div class="tab-pane fade" id="sn">
+        <th:block th:replace="common::shopcontent('SN')"></th:block>
+    </div>
+    <div class="tab-pane fade" id="pdd">
+        <p>功能未上线</p>
+    </div>
+</div>
+
+<th:block th:replace="common::shopjs"></th:block>
+
+</body>
+</html>

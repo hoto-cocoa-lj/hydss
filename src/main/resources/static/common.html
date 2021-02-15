@@ -1,0 +1,129 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="test(a)">
+    <div th:if="${a eq 1}">=1</div>
+</th:block>
+
+<th:block th:fragment="head">
+    <meta charset="UTF-8">
+    <title>衡阳DSS</title>
+</th:block>
+
+<th:block th:fragment="jscsspart">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</th:block>
+
+<th:block th:fragment="shopcontent(shopname)">
+    <h2 style="padding-left: 10px">[[${shopname}]]</h2>
+    <!--    jd,sn-->
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th><input type="checkbox"/> No.</th>
+            <th>
+                <button type="submit" class="btn btn-primary" th:onclick="testlogin()">检查是否登录</button>
+                <button type="submit" class="btn btn-success" th:onclick="loginmany([[${shopname}]])">批量登录</button>
+                <button type="submit" class="btn btn-danger" th:onclick="logoutmany([[${shopname}]])">批量删除</button>
+            </th>
+            <th>账号</th>
+            <th>密码</th>
+            <th>状态</th>
+        </tr>
+        </thead>
+        <tbody th:each="item:${session.accMap}">
+        <tr th:if="${shopname eq item.key}" th:each="acc,stat:${item.value}" th:id="${acc.user}+${shopname}">
+            <td><input type="checkbox" th:name="'checkbox'+${shopname}" th:value="${acc.user}"/> [[${stat.count}]]</td>
+            <td>
+                <button type="submit" class="btn btn-success" th:onclick="loginone([[${acc.user}]],[[${shopname}]])">
+                    登录
+                </button>
+                <button type="submit" class="btn btn-danger" th:onclick="logoutone([[${acc.user}]],[[${shopname}]])">
+                    删除
+                </button>
+            </td>
+            <td th:text="${acc.user}"></td>
+            <td th:text="${acc.pwd}"></td>
+            <td th:text="${acc.state}+':'+${accStateMap[acc.state]}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="form-group">
+        <div class="col-sm-1">
+            <button class="btn btn-primary" th:onclick="get0([[${shopname}]])">GET</button>
+        </div>
+        <div class="col-sm-11">
+            <input type="text" class="form-control" th:name="'url'+${shopname}" th:id="'url'+${shopname}"
+                   placeholder="请输入URL">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-1">
+            <button class="btn btn-danger" id="post0">POST</button>
+        </div>
+        <div class="col-sm-11">
+            <textarea class="form-control" th:name="'postparam'+${shopname}" th:id="'postparam'+${shopname}"
+                      rows="3" placeholder="请输入POST的参数,功能未上线"></textarea></div>
+    </div>
+</th:block>
+
+<th:block th:fragment="shopjs">
+    <script th:inline="javascript">
+        //accStateMap:{"0":"未登录或未知状态","1":"已登录"}
+        var accStateMap = [[${accStateMap}]];
+
+        $('#loginmany').click(function () {
+            $.ajax({
+                url: "/loginmany", success: function (result) {
+                    console.log(result);
+                }
+            });
+        })
+
+        //查看是否登录，并修改state
+        function loginone(name, shopname) {
+            $.ajax({
+                url: "/loginone?name=" + name + "&shopname=" + shopname, success: function (acc) {
+                    console.log('loginone:' + JSON.stringify(acc));
+                    state = accStateMap[acc.state];
+                    tds = $('#' + name + shopname).find('td');
+                    tds.eq(tds.length - 1).text(acc.state + ':' + accStateMap[acc.state]);
+                }
+            });
+        }
+
+        function get0(shopname) {
+            url = $('#url' + shopname).val()
+            if (url.trim() == "") {
+                alert('请输入URL');
+                return
+            }
+            names = []
+            $(':checkbox[name=checkbox' + shopname + ']:checked').map((a, i) => names.push(i.value))
+            if (names.length == 0) {
+                alert('请勾选账号');
+                return
+            }
+            // data = {names: JSON.stringify(names), shopname: shopname, url: url}
+            // data = {names: names, shopname: shopname, url: url}
+            data = JSON.stringify({names: names, shopname: shopname, url: url})
+            //data=JSON.stringify({'data':123,'a':22})
+            console.log(data)
+            $.ajax({
+                type: 'POST',
+                url: "/get0",
+                data: data,
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    console.log(result);
+                },
+            });
+        }
+
+        function testlogin() {
+            window.location.href = '/testlogin'
+        }
+    </script>
+</th:block>

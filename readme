@@ -1,0 +1,16 @@
+springmvc接收ajax post的参数:
+    @RequestBody 貌似必须用一个形参来接收，否则报错；形参名字任意
+    @PostMapping("/get0")
+    public void ge0(HttpSession session, @RequestBody Map body) throws InterruptedException {
+        System.out.println(data.get("names"));
+    }
+    $.ajax({
+        type: 'POST',
+        url: "/get0",
+        data: JSON.stringify({names: names, shopname: shopname, url: url})ta,
+        dataType:"json",
+        contentType:"application/json;charset=utf-8",
+        success: function (result) {
+            console.log(result);
+        },
+    });
